@@ -1,0 +1,175 @@
+---
+title: "RMarkdown Template"
+author: "Pedro Lopez Ayala"
+date: "`r format(Sys.time(), '%d %B, %Y')`" #or "`r Sys.Date()`" if you wish Year, month, date
+output:
+  html_document:
+    code_folding: hide #enables you to include R code but have it hidden by default
+    toc: true #add a table of contents (TOC) using the toc option
+    toc_float: true #float the table of contents to the left of the main document content.
+    toc_depth: 2 #Depth of headers. If not specified it defaults to 3 (meaning that all level 1, 2, and 3 headers will be included in the table of contents)
+    theme: default # lots of nice themes can be used: https://bootswatch.com/
+    highlight: tango
+---
+
+```{r echo=FALSE, message=TRUE, warning=TRUE}
+# function to check whether you have installed all packages used in this RMarkdown file. 
+# It also gives you the package version
+# Only read it the first time you use this RMarkdown template. 
+# After installing all required packages either delete it or 
+# simply change message to FALSE and warning to FALSE, so it will not appear when you render the file
+
+using <- function(...) {
+  packages <- unlist(list(...)) #list of packages you want to check
+  package_list <- .packages(all.available = T) #all the packages you have in your current library path
+  for (vari in packages) {
+    if (length(which(package_list %in% vari)) > 0) {
+      #print(glue::glue("{vari} is installed"))
+      print(paste(vari, "is installed"))
+      print(paste("package Version", packageVersion(vari)))
+      } else if (length(which(package_list %in% vari)) == 0) {
+        print(paste(vari, "is not installed"))
+        print(paste0("Please type: install.packages('",vari,"') for installing the package"))
+        if (vari == "tinytex") {
+          print(paste("Package", vari, "is required for rendering pdf files with RMarkdown"))
+          print(paste0("For installing ", vari, " you must type"))
+          print(paste("install.packages('tinytex')"))
+          print(paste("tinytex::install_tinytex()"))
+        }
+      }
+  }
+}
+
+using("pander", "knitr", "tinytex", "dplyr", "glue", "Hmisc", "rms", "summarytools", "ggplot2", "consort", "htmlwidgets")
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r packages, message=FALSE, warning=FALSE}
+library(dplyr)
+library(Hmisc)
+library(summarytools)
+library(ggplot2)
+library(rms)
+library(htmlwidgets)
+```
+
+This `.Rmd` file is a template for you to use. It contains the most important features for creating a good report. The structure followed is not necessarily the structure you should follow when undergoing the analysis of your data nor when reporting your findings. The aim of this template is simply to present you a good structure for data reporting and the code behind it. 
+
+The structure used in this Rmarkdown report is:
+
+* Background - describe in a concise way the background of the research field, the research question of interest, etc
+* Data dictionary - makes it easier for the reader to know the meaning of each variable. Can select those variables of interest for analysis, no need to show the whole data set
+* Flowchart - Show how many patients are excluded from the analysis
+* Descriptive statistics - show univariable analysis for continuous and categorical variables so the audience has a good overlook of the data.
+* Table 1 - There are better ways of describing your data, but everybody wants to see a Table 1
+* Model - Visualize your model and your effects
+* Diagnostic Performance of the model - measures such as discrimination and calibration
+* Conclusion
+* Computer environment - always end with the computer environment used for reproducibility
+
+
+# Background
+
+Here you write the background of your study, research question, etc. E.g.
+
+The `Gusto-I trial` was a randomized trial comparing 4 thrombolytic strategies for acute myocardial infarction. The original study can be found [here](https://www.nejm.org/doi/full/10.1056/nejm199309023291001).
+
+Our aim is to predict 30-day mortality. Because this is simply a template for showing how to use RMarkdown, I will not go into much detail and will simply get to the stage of model derivation. Model validation with a resampling technique (bootstrap internal validation) will not be shown. Important aspects like discrimination and calibration of the model, shrinkage of coefficients for protection of future overfitting or plotting decision curve analysis for assessing benefit of the model will not be shown here. 
+
+# Data
+
+Data is obtained from http://hbiostat.org/data courtesy of the Vanderbilt University Department of Biostatistics.
+
+```{r data}
+load(url('http://hbiostat.org/data/gusto.rda'))
+df <- as.data.frame(gusto)
+# keep only SK and tPA arms; and selected set of covariates
+# gusto <- Hmisc::upData(gusto, subset = tx %in% c('SK', 'tPA'),
+#                        tx = droplevels(tx),
+#                        keep = Hmisc::Cs(day30, tx, age, Killip, sysbp, pulse, pmi, miloc, sex))
+
+```
+
+# Data dictionary
+
+```{r }
+Hmisc::html(Hmisc::contents(df), levelType = 'table')
+```
+
+
+# Patient Flowchart 
+
+We want to keep patients who received either streptokinase (`SK`) or primary angioplasty (`tPA`).
+
+```{r Flowchart, fig.align='center'}
+docl <- list()
+docl[['all']] <- nrow(df)
+docl[['sk_tPA']] <- table(df$tx)[1]
+df <- df %>% filter(tx %in% c('SK', 'tPA'))
+df$tx <- droplevels(df$tx) #tx was a three level categorical variable. Drop unused level (SK+tPA)
+docl[['analysis']] <- nrow(df)
+
+txt1 <- glue::glue("Patients recruited in \n the GUSTO-I trial \n (n={docl$all})")
+txt1_side <- glue::glue("Excluded (n={docl$sk_tPA}):\n\u2022 Received SK+tPA (n={docl$sk_tPA})")
+txt2 <- glue::glue("Main analysis \n (n={docl$analysis})")
+
+flowchart <- consort::add_box(txt = txt1) %>% 
+  consort::add_side_box(txt = txt1_side, dist = 0.05) %>%   
+  consort::add_box(txt = txt2, dist = 0.05) 
+
+plot(flowchart)
+```
+
+# Descriptive statistics
+
+
+## Summary using `summarytools`
+
+```{r dfsummary, results = 'asis'}
+print(summarytools::dfSummary(df, 
+                              varnumbers = FALSE,
+                              valid.col = FALSE,
+                              labels.col = FALSE,
+                              graph.magnif = 0.76,
+                              headings = F), 
+      max.tbl.height = 300,
+      method = "render")
+```
+
+
+## Summary using `Hmisc` {.tabset}
+
+```{r}
+d <- Hmisc::describe(df)
+Hmisc::html(d)
+```
+
+
+### continuous variables
+
+```{r hmisc-cat}
+p <- plot(d)
+plotly::subplot(p[1])
+```
+
+
+### categorical variables
+
+```{r hmisc-cont}
+plotly::subplot(p[2])
+```
+
+
+# Table 1
+
+```{r}
+
+```
+
+
+
+
