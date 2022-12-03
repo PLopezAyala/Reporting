@@ -93,7 +93,7 @@ Note that this `.Rmd` file was written with the intention to knit to HTML. I bel
 The `Gusto-I trial` was a randomized trial comparing 4 thrombolytic strategies for acute myocardial infarction. The original study can be found [here](https://www.nejm.org/doi/full/10.1056/nejm199309023291001).
 
 ```{r picture, fig.align = 'center', out.width = '70%', fig.cap='GUSTO-I trial published in the NEJM.'}
-knitr::include_graphics("./Figures/Gusto_NEJM.png") 
+knitr::include_graphics("./Figures/Gusto_NEJM.png") #need to download Figure from Repository (or simply suppress this chunk with eval=FALSE)
 ```
 
 Our aim is to derive a model for predicting 30-day mortality. Because this is simply a template for showing how to use RMarkdown, I will not go into much detail and will simply get to the stage of model derivation and showing partial effect plots. Model validation with a resampling technique (e.g. bootstrap internal validation) will not be shown. Important aspects like discrimination and calibration of the model, shrinkage of coefficients for protection of future overfitting or plotting decision curve analysis for assessing net benefit of the model will not be shown here. ^[To learn prediction modelling the go-to source is Frank Harrell https://hbiostat.org/rmsc/ or Ewout Steyerberg https://link.springer.com/book/10.1007/978-0-387-77244-8]
