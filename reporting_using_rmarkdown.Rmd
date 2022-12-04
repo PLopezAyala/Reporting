@@ -1,5 +1,5 @@
 ---
-title: "RMarkdown Template"
+title: "R Markdown Template"
 author: "Pedro Lopez Ayala"
 date: "`r format(Sys.time(), '%d %B, %Y')`" #or "`r Sys.Date()`" if you wish Year, month, date
 output:
@@ -10,12 +10,13 @@ output:
     toc_depth: 3 #Depth of headers. If not specified it defaults to 3 (meaning that all level 1, 2, and 3 headers will be included in the table of contents)
     theme: default # lots of nice themes can be used: https://bootswatch.com/
     highlight: tango #there exists different highlights too
+bibliography: packages.bib  #name of the .bib text file where the references are saved. Suppose you have more than one .bib text, e.g. one for R packages and one for manuscript references - then use [packages.bib, references.bib]
 ---
 
 ```{r echo=FALSE, message=TRUE, warning=TRUE, results='hide'}
-# function to check whether you have installed all packages used in this RMarkdown file. 
+# function to check whether you have installed all packages used in this R Markdown file. 
 # It also gives you the package version
-# Read it the first time you use this RMarkdown template in order to know whether you have all required packages installed.
+# Read it the first time you use this R Markdown template in order to know whether you have all required packages installed.
 # After installing all required packages, you can delete this chunk, leave it with results='hide' or even better eval=FALSE so it will not be evaluated. 
 
 using <- function(...) {
@@ -30,7 +31,7 @@ using <- function(...) {
         print(paste(vari, "is not installed"))
         print(paste0("Please type: install.packages('",vari,"') for installing the package"))
         if (vari == "tinytex") {
-          print(paste("Package", vari, "is required for rendering pdf files with RMarkdown"))
+          print(paste("Package", vari, "is required for rendering pdf files with R Markdown"))
           print(paste0("For installing ", vari, " you must type"))
           print(paste("install.packages('tinytex')"))
           print(paste("tinytex::install_tinytex()"))
@@ -39,7 +40,7 @@ using <- function(...) {
   }
 }
 
-using("pander", "knitr", "tinytex", "dplyr", "glue", "Hmisc", "rms", "summarytools", "ggplot2", "gt", "gtsummary", "consort", "htmlwidgets") #packages I used for this report. Package pander and knitr are required for RMarkdown. Package tinytex only if you want to knit to pdf.
+using("pander", "knitr", "rmarkdown", "tinytex", "dplyr", "glue", "Hmisc", "rms", "summarytools", "ggplot2", "gt", "gtsummary", "consort", "htmlwidgets") #packages I used for this report. Package pander and knitr are required for R Markdown. Package tinytex only if you want to knit to pdf.
 
 ```
 
@@ -60,9 +61,9 @@ library(glue)
 library(htmlwidgets)
 ```
 
-This `.Rmd` file was written with the aim to aid you when writing your first reports in RMarkdown. It contains the most important features for creating a good reproducible report. The structure followed is not necessarily the one you should follow when performing your data analysis or reporting your results. The purpose of this template is simply to present you with a good structure for the data report and the code behind it. 
+This `.Rmd` file was written with the aim to aid you when writing your first reports in R Markdown. It contains the most important features for creating a good reproducible report. The structure followed is not necessarily the one you should follow when performing your data analysis or reporting your results. The purpose of this template is simply to present you with a good structure for the data report and the code behind it. 
 
-The structure used in this Rmarkdown report is the following:
+The structure used in this R Markdown report is the following:
 
 * Background - describe in a concise way the background of the research field, the research question of interest, etc
 * Data dictionary - makes it easier for the reader to know the meaning of each variable. Can select those variables of interest for analysis, no need to show the whole data set
@@ -72,6 +73,7 @@ The structure used in this Rmarkdown report is the following:
 * Model - Visualize your model and your effects
 * Conclusion
 * Computer environment - always include the computer environment used. It fosters reproducibility
+* Update history - optional. To show changes over time in your report.
 
 Through this report I have used different chunk options. Below a short summary of the ones I have used. For a detail explanation of these and many other chunk options, please check [this](https://yihui.org/knitr/options/#chunk-options).
 
@@ -88,7 +90,50 @@ Through this report I have used different chunk options. Below a short summary o
 
 Note that this `.Rmd` file was written with the intention to knit to HTML. I believe that HTML files have more advantages than pdf or word files and are easier to present to your PI or colleagues.
 
-# Background
+<details>
+
+<!-- The HTML <details> tag specifies additional details that the user can open and close on demand. -->
+
+<summary>
+::: {style="color: red;"} 
+How to insert references in your Report?
+::: 
+</summary>
+
+I personally prefer to use hyperlinks than references because it allows users to access the specific manuscript or book directly. However, a reference Section at the end of your Report might be of interest to have a quick overview of the bibliography used. 
+
+To do this you will need to create a plain-text file with the `.bib` extension that consists of bibliography entries. You can do this automatically with the `knitr::write_bib()` function. This function uses `utils::citation()` and `utils::toBibtex()` to create bib entries for R packages and write them in a file. 
+
+```{r bib-database, eval=FALSE}
+# automatically create a bib database for R packages 
+knitr::write_bib(x = c('knitr', 'rmarkdown'), #specify package name(s).
+                 file = 'packages.bib') # the .bib file to write
+```
+
+You can also use the `.packages()` argument. This will create a bib entry for all R packages loaded in the report, on top of the packages you specified manually.
+
+```{r }
+knitr::write_bib(x = c(.packages(), 'knitr', 'rmarkdown'), # .packages() will create a bib entry for all R packages used in the report
+                 file = 'packages.bib') # the .bib file to write
+```
+
+Items can be cited directly within the documentation using the syntax `@key` where key is the citation key in the first line of the entry. For example:
+
+The main packages needed to create an R Markdown report are the **rmarkdown** package [@R-rmarkdown] and the **knitr** package [@R-knitr]. To read more about the rmarkdown package, read the [R Markdown: the definitive guide](https://bookdown.org/yihui/rmarkdown/) book [@rmarkdown2018] or the [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/) [@rmarkdown2020].
+
+The references will be automatically created at the end of your R Markdown report file. Importantly, to insert references in your R Markdown report you will need to specify a bibliography file using the `bibliography` metadata field in YAML.
+
+You can also create a `.bib` file manually and insert references by hand. Simply use the `utils::citation()` function to see how to cite R and R packages. 
+
+```{r}
+citation(package = "base")
+```
+
+You would copy the output BibTeX entry into your `.bib` file.
+
+</details>
+
+# Background 
 
 The `Gusto-I trial` was a randomized trial comparing 4 thrombolytic strategies for acute myocardial infarction. The original study can be found [here](https://www.nejm.org/doi/full/10.1056/nejm199309023291001).
 
@@ -96,7 +141,7 @@ The `Gusto-I trial` was a randomized trial comparing 4 thrombolytic strategies f
 knitr::include_graphics("./Figures/Gusto_NEJM.png") #need to download Figure from Repository (or simply suppress this chunk with eval=FALSE)
 ```
 
-Our aim is to derive a model for predicting 30-day mortality. Because this is simply a template for showing how to use RMarkdown, I will not go into much detail and will simply get to the stage of model derivation and showing partial effect plots. Model validation with a resampling technique (e.g. bootstrap internal validation) will not be shown. Important aspects like discrimination and calibration of the model, shrinkage of coefficients for protection of future overfitting or plotting decision curve analysis for assessing net benefit of the model will not be shown here. ^[To learn prediction modelling the go-to source is Frank Harrell https://hbiostat.org/rmsc/ or Ewout Steyerberg https://link.springer.com/book/10.1007/978-0-387-77244-8]
+Our aim is to derive a model for predicting 30-day mortality. Because this is simply a template for showing how to use R Markdown, I will not go into much detail and will simply get to the stage of model derivation and showing partial effect plots. Model validation with a resampling technique (e.g. bootstrap internal validation) will not be shown. Important aspects like discrimination and calibration of the model, shrinkage of coefficients for protection of future overfitting or plotting decision curve analysis for assessing net benefit of the model will not be shown here. ^[To learn prediction modelling the go-to source is Frank Harrell https://hbiostat.org/rmsc/ or Ewout Steyerberg https://link.springer.com/book/10.1007/978-0-387-77244-8]
 
 # Data
 
@@ -285,7 +330,7 @@ $$
 Probability = \frac{1}{1 + e^{(-(lp))}} \text{, where lp =  } \alpha + x_1\beta_1 + x_2\beta_2 + x_n\beta_n  
 $$
 
-Yes, you can insert equations in RMarkdown with LaTeX notation. Take a look at different [LaTeX symbols](https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols).
+Yes, you can insert equations in R Markdown with LaTeX notation. Take a look at different [LaTeX symbols](https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols).
 
 
 ```{r}
@@ -297,7 +342,7 @@ print(model, digits = 4, table = TRUE, conf.int = 0.95,
 ```
 
 
-## Visualize Model {.tabset}
+## Visualize Model {.tabset} 
 
 Suppose we would like to show different ways of visualizing/interpreting our model. We could show each Figure one below the other, but there is a more elegant way. Tabsets! Tabsets are very useful when wanting to report more than 1 Figure or Table. 
 
@@ -313,7 +358,6 @@ plot(nomogram(model))
 ggplot(rms::Predict(model, fun = plogis), rdata = df)
 ```
 
-
 ### More
 
 ```{r pep2, fig.align='center'}
@@ -328,7 +372,11 @@ ggplot(rms::Predict(model, age, sysbp = sbp, Killip, fun = plogis))
 ```
 
 
-### Heatmap
+### Nested tabset {.tabset}
+
+We can embedd one tabset in another.
+
+#### heatmap
 
 ```{r heat, fig.align='center', fig.cap='Heatmap showing predicted probabilities at different ages and systolic blood pressure for the 4 Killip classes.'}
 pred_intx <- rms::Predict(model, age, sysbp, Killip, fun = plogis, np = 100) 
@@ -343,10 +391,23 @@ rms::bplot(
   )
 ```
 
+#### Wireplot 3D
+
+```{r wire, fig.align='center', fig.cap='3D plot', fig.dim=c(7,7)}
+rms::bplot(
+  pred_intx,
+  lfun = wireframe,
+  perim = bounds,
+  ylab = "sysbp",
+  zlab = "Pr(30-day Death)",
+  shade = T
+  )
+```
+
 
 # Conclusion
 
-Hope this template will aid you when creating a `.html` report file with RMarkdown. Note that since RStudio version 
+Hope this template will aid you when creating a `.html` report file with R Markdown. Note that since RStudio version 
 `version 1.4` or higher, R Markdown has incorporated a [visual editing mode](https://rstudio.github.io/visual-markdown-editing/), making all aspects of creating and rendering a report very easy.
 
 
@@ -356,3 +417,21 @@ Hope this template will aid you when creating a `.html` report file with RMarkdo
 sessioninfo::session_info(pkgs = c("attached"), include_base = T)
 ```
 
+# Update History 
+
+<details>
+ 
+You can create an update history section to show changes in your report over time.(e.g. someone asks for a new analysis, changes, etc). 
+
+<summary>Click to expand</summary>
+
+| Date       | Changes                                        |
+| :--------- | :--------------------------------------------- |
+| 2022-12-04 | Added example of how to insert references      |
+| 2022-12-04 | Added example of how to create a nested tabset |
+| 2022-12-03 | Published                                      |
+
+
+</details>
+
+# References
