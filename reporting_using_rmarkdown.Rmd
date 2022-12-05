@@ -27,6 +27,10 @@ using <- function(...) {
       #print(glue::glue("{vari} is installed"))
       print(paste(vari, "is installed"))
       print(paste("package Version", packageVersion(vari)))
+      if (vari == "summarytools") {
+        print(paste("To take advantage of all features in summarytools, make sure to have installed Xquartz."))
+        print(paste("You can download it from https://www.xquartz.org"))
+      }
       } else if (length(which(package_list %in% vari)) == 0) {
         print(paste(vari, "is not installed"))
         print(paste0("Please type: install.packages('",vari,"') for installing the package"))
@@ -36,11 +40,17 @@ using <- function(...) {
           print(paste("install.packages('tinytex')"))
           print(paste("tinytex::install_tinytex()"))
         }
+        if (vari == "summarytools") {
+          print(paste("Package ", vari, "is required for creating a visual Summary of a data frame"))
+          print(paste0("For installing ", vari, "you must type"))
+          print(paste("install.packages(summarytools)"))
+          print(paste("Additionally, you will need to install Xquartz to take advantage of all features. You can download it from https://www.xquartz.org"))
+        }
       }
   }
 }
 
-using("pander", "knitr", "rmarkdown", "tinytex", "dplyr", "glue", "Hmisc", "rms", "summarytools", "ggplot2", "gt", "gtsummary", "consort", "htmlwidgets") #packages I used for this report. Package pander and knitr are required for R Markdown. Package tinytex only if you want to knit to pdf.
+using("pander", "knitr", "rmarkdown", "tinytex", "dplyr", "glue", "Hmisc", "rms", "summarytools", "ggplot2", "plotly", "gt", "gtsummary", "consort", "htmlwidgets") #packages I used for this report. Package pander and knitr are required for R Markdown. Package tinytex only if you want to knit to pdf.
 
 ```
 
@@ -226,7 +236,7 @@ Hmisc::html(d) #use scroll = TRUE for scrolling the output table
 
 ```
 
-### Continuous variables
+### Categorical variables
 
 The nice thing of `.html` format is the possibility of using interactive plots. The `plotly` package allows you to render interactive plots. Simply place your cursor on top of the figure and all the information for a specific point will be shown. 
 
@@ -235,7 +245,7 @@ p <- plot(d)
 plotly::subplot(p[1])
 ```
 
-### Categorical variables
+### Continuous variables
 
 The nice thing of `.html` format is the possibility of using interactive plots. The `plotly` package allows you to render interactive plots. Simply place your cursor on top of the figure and all the information for a specific point will be shown. 
 
@@ -425,11 +435,12 @@ You can create an update history section to show changes in your report over tim
 
 <summary>Click to expand</summary>
 
-| Date       | Changes                                        |
-| :--------- | :--------------------------------------------- |
-| 2022-12-04 | Added example of how to insert references      |
-| 2022-12-04 | Added example of how to create a nested tabset |
-| 2022-12-03 | Published                                      |
+| Date       | Changes                                                                                 |
+| :--------- | :-------------------------------------------------------------------------------------- |
+| 2022-12-05 | Install [Xquartz](https://www.xquartz.org) if willing to use the `summarytools` package |
+| 2022-12-04 | Added example of how to insert references                                               |
+| 2022-12-04 | Added example of how to create a nested tabset                                          |
+| 2022-12-03 | Published                                                                               |
 
 
 </details>
