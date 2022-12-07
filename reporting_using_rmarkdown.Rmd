@@ -9,7 +9,7 @@ output:
     toc_float: true #float the table of contents to the left of the main document content.
     toc_depth: 3 #Depth of headers. If not specified it defaults to 3 (meaning that all level 1, 2, and 3 headers will be included in the table of contents)
     theme: default # lots of nice themes can be used: https://bootswatch.com/
-    highlight: tango #there exists different highlights too
+    highlight: tango #Supported styles include default, tango, pygments, kate, monochrome, espresso, zenburn, haddock, breezedark, and textmate. Pass null to prevent syntax highlighting.
 bibliography: packages.bib  #name of the .bib text file where the references are saved. Suppose you have more than one .bib text, e.g. one for R packages and one for manuscript references - then use [packages.bib, references.bib]
 ---
 
@@ -85,7 +85,7 @@ The structure used in this R Markdown report is the following:
 * Computer environment - always include the computer environment used. It fosters reproducibility
 * Update history - optional. To show changes over time in your report.
 
-Through this report I have used different chunk options. Below a short summary of the ones I have used. For a detail explanation of these and many other chunk options, please check [this](https://yihui.org/knitr/options/#chunk-options).
+Through this report I have used different chunk options. Below a short summary of the ones I have used. For a detail explanation of these and many other chunk options, please check [this](https://yihui.org/knitr/options/#chunk-options){target="_blank"}.
 
 * `echo = FALSE` hide code (default is `TRUE` hence code is displayed) but result is shown
 * `warning = FALSE` drop warnings from output document (default is `TRUE`)
@@ -129,7 +129,7 @@ knitr::write_bib(x = c(.packages(), 'knitr', 'rmarkdown'), # .packages() will cr
 
 Items can be cited directly within the documentation using the syntax `@key` where key is the citation key in the first line of the entry. For example:
 
-The main packages needed to create an R Markdown report are the **rmarkdown** package [@R-rmarkdown] and the **knitr** package [@R-knitr]. To read more about the rmarkdown package, read the [R Markdown: the definitive guide](https://bookdown.org/yihui/rmarkdown/) book [@rmarkdown2018] or the [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/) [@rmarkdown2020].
+The main packages needed to create an R Markdown report are the **rmarkdown** package [@R-rmarkdown] and the **knitr** package [@R-knitr]. To read more about the rmarkdown package, read the [R Markdown: the definitive guide](https://bookdown.org/yihui/rmarkdown/){target="_blank"} book [@rmarkdown2018] or the [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/){target="_blank"} [@rmarkdown2020].
 
 The references will be automatically created at the end of your R Markdown report file. Importantly, to insert references in your R Markdown report you will need to specify a bibliography file using the `bibliography` metadata field in YAML.
 
@@ -145,7 +145,7 @@ You would copy the output BibTeX entry into your `.bib` file.
 
 # Background 
 
-The `Gusto-I trial` was a randomized trial comparing 4 thrombolytic strategies for acute myocardial infarction. The original study can be found [here](https://www.nejm.org/doi/full/10.1056/nejm199309023291001).
+The `Gusto-I trial` was a randomized trial comparing 4 thrombolytic strategies for acute myocardial infarction. The original study can be found [here](https://www.nejm.org/doi/full/10.1056/nejm199309023291001){target="_blank"}.
 
 ```{r picture, fig.align = 'center', out.width = '70%', fig.cap='GUSTO-I trial published in the NEJM.'}
 knitr::include_graphics("./Figures/Gusto_NEJM.png") #need to download Figure from Repository (or simply suppress this chunk with eval=FALSE)
@@ -340,7 +340,7 @@ $$
 Probability = \frac{1}{1 + e^{(-(lp))}} \text{, where lp =  } \alpha + x_1\beta_1 + x_2\beta_2 + x_n\beta_n  
 $$
 
-Yes, you can insert equations in R Markdown with LaTeX notation. Take a look at different [LaTeX symbols](https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols).
+Yes, you can insert equations in R Markdown with LaTeX notation. Take a look at different [LaTeX symbols](https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols){target="_blank"}.
 
 
 ```{r}
@@ -418,7 +418,7 @@ rms::bplot(
 # Conclusion
 
 Hope this template will aid you when creating a `.html` report file with R Markdown. Note that since RStudio version 
-`version 1.4` or higher, R Markdown has incorporated a [visual editing mode](https://rstudio.github.io/visual-markdown-editing/), making all aspects of creating and rendering a report very easy.
+`version 1.4` or higher, R Markdown has incorporated a [visual editing mode](https://rstudio.github.io/visual-markdown-editing/){target="_blank"}, making all aspects of creating and rendering a report very easy.
 
 
 # Computing Environment
@@ -437,7 +437,8 @@ You can create an update history section to show changes in your report over tim
 
 | Date       | Changes                                                                                 |
 | :--------- | :-------------------------------------------------------------------------------------- |
-| 2022-12-05 | Install [Xquartz](https://www.xquartz.org) if willing to use the `summarytools` package |
+| 2022-12-07 | Added {target="_blank"} after each hyperlink. Now linked websites are opened in a new window or tab |
+| 2022-12-05 | Install [Xquartz](https://www.xquartz.org){target="_blank"} if willing to use the `summarytools` package |
 | 2022-12-04 | Added example of how to insert references                                               |
 | 2022-12-04 | Added example of how to create a nested tabset                                          |
 | 2022-12-03 | Published                                                                               |
