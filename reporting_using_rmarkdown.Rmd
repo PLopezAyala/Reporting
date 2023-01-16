@@ -18,6 +18,7 @@ bibliography: packages.bib  #name of the .bib text file where the references are
 # It also gives you the package version
 # Read it the first time you use this R Markdown template in order to know whether you have all required packages installed.
 # After installing all required packages, you can delete this chunk, leave it with results='hide' or even better eval=FALSE so it will not be evaluated. 
+# This chunk is not necessary because you already show the computing environment at the end of your R Markdown report.
 
 using <- function(...) {
   packages <- unlist(list(...)) #list of packages you want to check
