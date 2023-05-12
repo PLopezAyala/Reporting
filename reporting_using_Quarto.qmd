@@ -62,11 +62,11 @@ The structure used in this Quarto report is the following:
 
 Through this report I have used different chunk options. Below a short summary of the ones I have used. For a detail explanation of these and many other chunk options, please check [this](https://quarto.org/docs/reference/formats/html.html). 
 
-* `echo: FALSE` hide code (default is `TRUE` hence code is displayed) but result is shown
-* `warning: FALSE` drop warnings from output document (default is `TRUE`)
-* `message: FALSE` suppress messages (default is `TRUE`)
-* `eval: FALSE` do not evaluate the code (default is `TRUE`) but the code appears if `echo=T` was chosen
-* `include: FALSE` to hide both the code and the result from the rendered document but the code is still evaluated
+* `echo: false` hide code (default is `true` hence code is displayed) but result is shown
+* `warning: false` drop warnings from output document (default is `true`)
+* `message: false` suppress messages (default is `true`)
+* `eval: false` do not evaluate the code (default is `true`) but the code appears if `echo: true` was chosen
+* `include: false` to hide both the code and the result from the rendered document but the code is still evaluated
 * `label:` For figures produced by executable code cells, include a `label` with a `fig-` prefix to make them cross-referenceable (and for ordering the Figures, e.g. Figure 1, Figure 2). For a table, use the `tbl-` prefix.
 * `fig-align:` to align the figure. Four options exist `default`, `left`, `right` or `center`
 * `fig-cap:` write a figure caption
@@ -75,7 +75,24 @@ Through this report I have used different chunk options. Below a short summary o
 * `out-width: 70%` and `out-height: 80%` width and height of the plot in the output document, which can be different with its physical `fig-width:` and `fig-height:`, i.e., plots can be scaled in the output document.
 * `fig-dpi:` dots per inch value (for image resolution). Default is 72
 * `tbl-cap:` write a table caption
+
+::: {.callout-important}
+
 One important difference between R Markdown documents and Quarto documents is that in Quarto, chunk options are typically included using the special comment `#|` at the top of code chunks rather than within the line that begins the chunk. 
+
+```{{r}}
+#| echo: true
+#| label: fig-myfig
+#| fig-cap: title of figure
+#| fig-align: center
+
+library(ggplot2)
+ggplot(data, aes(x=xvar, y=yvar)) +
+  geom_point() + 
+  geom_smooth() 
+```
+
+:::
 
 Note that this `.qmd` file was written with the intention to knit to HTML. I believe that HTML files have more advantages than pdf or word files and are easier to present to your PI or colleagues.
 
