@@ -79,9 +79,6 @@ One important difference between R Markdown documents and Quarto documents is th
 
 Note that this `.qmd` file was written with the intention to knit to HTML. I believe that HTML files have more advantages than pdf or word files and are easier to present to your PI or colleagues.
 
-https://quarto.org/docs/authoring/figures.html#figure-basics
-
-
 ::: {.callout-tip collapse=true}
 # How to insert references in your report?
 
