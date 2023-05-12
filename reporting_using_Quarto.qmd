@@ -1,0 +1,469 @@
+---
+title: "Quarto Template" 
+author: "Pedro Lopez Ayala"
+date: "`r format(Sys.time(), '%d %B, %Y')`" #or "`r Sys.Date()`" if you wish Year, month, date
+format: 
+  html: 
+    toc: true #add a table of contents (TOC) using the toc option
+    toc-depth: 5 #Depth of headers. If not specified it defaults to 3 (meaning that all level 1, 2, and 3 headers will be included in the table of contents)
+    toc-location: left #choose position of table of content. default is right
+    code-fold: true  #enables you to include R code but have it hidden by default 
+    code-tools: true #tools for readers to interact with the source code
+    number-sections: false #include numbers in your TOC (default is true)
+    embed-resources: true # Produce a standalone HTML file with no external dependencies
+    smooth-scroll: true #Enable smooth scrolling within the page. By default, smooth scroll is not enabled
+    link-external-newwindow: true # true to open external links in a new browser window or tab
+    link-external-icon: true #true to show an icon next to the link to indicate that it's external
+    theme: default #bootstrap 5 default. All themes can be found here https://quarto.org/docs/output-formats/html-themes.html
+editor: source
+execute: 
+  echo: true #with execute we set global options for code chunks so that all latter chunks will use these options. 
+  warning: false
+  message: false
+bibliography: packages.bib  #name of the .bib text file where the references are saved. Suppose you have more than one .bib text, e.g. one for R packages and one for manuscript references - then use [packages.bib, references.bib]
+---
+
+```{r}
+
+#library
+library(dplyr)
+library(Hmisc)
+library(rms)
+library(summarytools)
+library(consort)
+library(gtsummary)
+library(gt)
+library(ggplot2)
+library(glue)
+library(htmlwidgets)
+
+```
+
+::: {.callout-important}
+
+Quarto is designed to be highly compatible with existing R Markdown documents. You should generally be able to use Quarto to render any existing `Rmd` document without changes.
+
+:::
+
+This `.qmd` file was written with the aim to aid you when writing your first reports in Quarto. It contains the most important features for creating a good reproducible report. 
+
+The structure followed is not necessarily the one you should follow when performing your data analysis or reporting your results. The purpose of this template is simply to present you with a good structure for the data report and the code behind it.
+
+The structure used in this Quarto report is the following:
+
+* Background - describe in a concise way the background of the research field, the research question of interest, etc
+* Data dictionary - makes it easier for the reader to know the meaning of each variable. Can select those variables of interest for analysis, no need to show the whole data set
+* Flowchart - Show how many patients are excluded from the analysis
+* Descriptive statistics - show univariable analysis for continuous and categorical variables so the audience has a good overlook of the data.
+* Table 1 - There are better ways of describing your data, but everybody wants to see a Table 1
+* Model - Visualize your model and your effects
+* Conclusion
+* Computer environment - always include the computer environment used. It fosters reproducibility
+
+Through this report I have used different chunk options. Below a short summary of the ones I have used. For a detail explanation of these and many other chunk options, please check [this](https://quarto.org/docs/reference/formats/html.html). 
+
+* `echo: FALSE` hide code (default is `TRUE` hence code is displayed) but result is shown
+* `warning: FALSE` drop warnings from output document (default is `TRUE`)
+* `message: FALSE` suppress messages (default is `TRUE`)
+* `eval: FALSE` do not evaluate the code (default is `TRUE`) but the code appears if `echo=T` was chosen
+* `include: FALSE` to hide both the code and the result from the rendered document but the code is still evaluated
+* `label:` For figures produced by executable code cells, include a `label` with a `fig-` prefix to make them cross-referenceable (and for ordering the Figures, e.g. Figure 1, Figure 2). For a table, use the `tbl-` prefix.
+* `fig-align:` to align the figure. Four options exist `default`, `left`, `right` or `center`
+* `fig-cap:` write a figure caption
+* `fig-height:` height of the plot. Default is 5
+* `fig-width:` width of the plot. Default is 7
+* `out-width: 70%` and `out-height: 80%` width and height of the plot in the output document, which can be different with its physical `fig-width:` and `fig-height:`, i.e., plots can be scaled in the output document.
+* `fig-dpi:` dots per inch value (for image resolution). Default is 72
+* `tbl-cap:` write a table caption
+One important difference between R Markdown documents and Quarto documents is that in Quarto, chunk options are typically included using the special comment `#|` at the top of code chunks rather than within the line that begins the chunk. 
+
+Note that this `.qmd` file was written with the intention to knit to HTML. I believe that HTML files have more advantages than pdf or word files and are easier to present to your PI or colleagues.
+
+https://quarto.org/docs/authoring/figures.html#figure-basics
+
+
+::: {.callout-tip collapse=true}
+# How to insert references in your report?
+
+I personally prefer to use hyperlinks than references because it allows users to access the specific manuscript or book directly. However, a reference Section at the end of your Report might be of interest to have a quick overview of the bibliography used. 
+
+To do this you will need to create a plain-text file with the `.bib` extension that consists of bibliography entries. You can do this automatically with the `knitr::write_bib()` function. This function uses `utils::citation()` and `utils::toBibtex()` to create bib entries for R packages and write them in a file. 
+
+```{r }
+#| eval: false
+# automatically create a bib database for R packages 
+knitr::write_bib(x = c('knitr', 'rmarkdown'), #specify package name(s).
+                 file = 'packages.bib') # the .bib file to write
+```
+
+You can also use the `.packages()` argument. This will create a bib entry for all R packages loaded in the report, on top of the packages you specified manually.
+
+```{r }
+knitr::write_bib(x = c(.packages(), 'knitr', 'rmarkdown'), # .packages() will create a bib entry for all R packages used in the report
+                 file = 'packages.bib') # the .bib file to write
+```
+
+Items can be cited directly within the documentation using the syntax `@key` where key is the citation key in the first line of the entry. For example:
+
+The main packages needed to create an R Markdown report are the **rmarkdown** package [@R-rmarkdown] and the **knitr** package [@R-knitr]. To read more about the rmarkdown package, read the [R Markdown: the definitive guide](https://bookdown.org/yihui/rmarkdown/) book [@rmarkdown2018] or the [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/) [@rmarkdown2020].
+
+The references will be automatically created at the end of your R Markdown report file. Importantly, to insert references in your R Markdown report you will need to specify a bibliography file using the `bibliography` metadata field in YAML.
+
+You can also create a `.bib` file manually and insert references by hand. Simply use the `utils::citation()` function to see how to cite R and R packages. 
+
+```{r}
+citation(package = "base")
+```
+
+You would copy the output BibTeX entry into your `.bib` file.
+
+:::
+
+
+# Background 
+
+The `Gusto-I trial` was a randomized trial comparing 4 thrombolytic strategies for acute myocardial infarction. The original study can be found [here](https://www.nejm.org/doi/full/10.1056/nejm199309023291001){target="_blank"}.
+
+```{r }
+#| label: fig-nejm
+#| fig-align: center
+#| out-width: '70%'
+#| fig-cap: GUSTO-I trial published in the NEJM
+
+knitr::include_graphics("Figures/Gusto_NEJM.png") #need to download Figure from Repository (or simply suppress this chunk with eval: false)
+```
+
+Our aim is to derive a model for predicting 30-day mortality. Because this is simply a template for showing how to use R Markdown, I will not go into much detail and will simply get to the stage of model derivation and showing partial effect plots. Model validation with a resampling technique (e.g. bootstrap internal validation) will not be shown. Important aspects like discrimination and calibration of the model, shrinkage of coefficients for protection of future overfitting or plotting decision curve analysis for assessing net benefit of the model will not be shown here. ^[To learn prediction modelling the go-to source is Frank Harrell https://hbiostat.org/rmsc/ or Ewout Steyerberg https://link.springer.com/book/10.1007/978-0-387-77244-8]
+
+# Data
+
+Data is obtained from http://hbiostat.org/data courtesy of the Vanderbilt University Department of Biostatistics.
+
+```{r }
+load(url('http://hbiostat.org/data/gusto.rda'))
+df <- as.data.frame(gusto)
+```
+
+# Data dictionary
+
+```{r }
+Hmisc::html(Hmisc::contents(df), levelType = 'table')
+```
+
+
+# Patient Flowchart 
+
+We want to keep patients who received either streptokinase (`SK`) or primary angioplasty (`tPA`).
+
+```{r }
+#| label: fig-flowchart
+#| fig-align: center
+#| fig-cap: Patient flowchart using the {consort} package
+#| fig-dpi: 100
+
+# dpi (dots per inch) for bitmap devices (dpi * inches = pixels). Default is 72
+docl <- list()
+docl[['all']] <- nrow(df)
+docl[['sk_tPA']] <- table(df$tx)[1]
+df <- df %>% filter(tx %in% c('SK', 'tPA'))
+df$tx <- droplevels(df$tx) #tx was a three level categorical variable. Drop unused level (SK+tPA)
+docl[['analysis']] <- nrow(df)
+
+txt1 <- glue::glue("Patients recruited in \n the GUSTO-I trial \n (n={docl$all})")
+txt1_side <- glue::glue("Excluded (n={docl$sk_tPA}):\n\u2022 Received SK+tPA (n={docl$sk_tPA})")
+txt2 <- glue::glue("Main analysis \n (n={docl$analysis})")
+
+flowchart <- consort::add_box(txt = txt1) %>% 
+  consort::add_side_box(txt = txt1_side, dist = 0.05) %>%   
+  consort::add_box(txt = txt2, dist = 0.05) 
+
+plot(flowchart)
+```
+
+# Descriptive statistics
+
+## Summary using `summarytools`
+
+::: {.callout-important}
+
+When downloading the `summarytools` package from CRAN, you will also need to install Xquartz to take advantage of all the features in `summarytools`. You can download it from [here](https://www.xquartz.org). 
+
+:::
+
+<!-- The code below is to allow scrolling in the horizontal axis. The `max.tbl.height` argument (in the code chunk) allows scrolling in the vertical axis -->
+<!-- Syntax for horizontal scroll of plots from here: -->
+<!-- https://stackoverflow.com/questions/52448104/how-to-add-horizontal-scroll-bar-for-a-ggplot-plot-in-rmarkdown-html -->
+
+<style>
+  .superbigimage{
+      overflow-x:scroll;
+      white-space: nowrap;
+  }
+
+  .superbigimage img{
+     max-width: none;
+  }
+
+
+</style>
+
+<div class="superbigimage">
+```{r }
+#| label: tbl-summary
+#| tbl-cap: Summary statistics using the {summarytools} package
+#| results: asis
+
+print(summarytools::dfSummary(df, 
+                              varnumbers = FALSE,
+                              valid.col = FALSE,
+                              labels.col = FALSE,
+                              graph.magnif = 0.76,
+                              headings = F), 
+      max.tbl.height = 300,
+      method = "render")
+```
+</div>
+
+## Summary using `Hmisc` {.tabset}
+
+```{r }
+
+d <- Hmisc::describe(df)
+Hmisc::html(d, scroll = TRUE) #scroll = TRUE is for scrolling the output table
+
+```
+
+### Categorical variables
+
+The nice thing of `.html` format is the possibility of using interactive plots. The `plotly` package allows you to render interactive plots. Simply place your cursor on top of the figure and all the information for a specific point will be shown. 
+
+```{r }
+#| label: fig-hmisc-cat
+#| fig-align: center
+#| fig-cap: Descriptive statistics of categorical variables
+
+p <- plot(d)
+plotly::subplot(p[1])
+```
+
+### Continuous variables
+
+The nice thing of `.html` format is the possibility of using interactive plots. The `plotly` package allows you to render interactive plots. Simply place your cursor on top of the figure and all the information for a specific point will be shown. 
+
+```{r }
+#| label: fig-hmisc-cont
+#| fig-align: center
+#| fig-cap: Descriptive statistics of continuous variables
+
+plotly::subplot(p[2])
+```
+
+### Missings
+
+There are no missings. 
+
+```{r }
+#| label: fig-hmisc-na
+#| fig-align: center
+#| fig-cap: Fractions of NAs per Variable
+#| fig-height: 7
+
+dd <- rms::datadist(df); options(datadist = "dd")
+na.patterns <- Hmisc::naclus(df)
+Hmisc::naplot(na.patterns, 'na per var')
+```
+
+
+# Table 1
+
+You can create a "Table1" directly in your `.Rmd` report, like done below. 
+
+```{r }
+#| label: tbl-table1
+#| tbl-cap: Table 1
+
+df_table1 <- df %>% 
+  select(
+    tx,
+    age,
+    sex,
+    Killip,
+    pulse,
+    sysbp,
+    htn,
+    dia,
+    smk,
+    pmi,
+    ste,
+    day30
+    ) %>% 
+  mutate(htn = ifelse(htn == 2, 1, 0))
+
+tbl_gtsummary_custom <- 
+  gtsummary::tbl_summary(
+    df_table1,
+    label = list(pulse ~ "Heart rate", 
+                 sysbp ~ "Systolic Blood Pressure",
+                 htn ~ "History of Hypertension",
+                 dia ~ "Diabetes",
+                 smk ~ "Smoking", 
+                 pmi ~ "Previous MI",
+                 ste ~ "Nbr ECG leads with ST-elevation",
+                 day30 ~ "Dead in the first 30-days"), 
+    by = tx, # split table by treatment received
+    missing = "no" # don't list missing data separately
+  ) %>%
+  gtsummary::add_overall() %>% # add column with overall summary statistics
+  gtsummary::add_n() %>% # add column with total number of non-missing observations
+  gtsummary::modify_header(label = "**Variable**") # update the column header
+
+#Add row headers
+tbl_gtsummary_custom <- tbl_gtsummary_custom %>% 
+  gtsummary::as_gt() %>% #convert to gt object and use gt functions
+  gt::tab_row_group(label = "Outcome", rows = 20) %>% 
+  gt::tab_row_group(label = "ECG findings", rows = 19) %>% 
+  gt::tab_row_group(label = "CVRF, n (%)", rows = 12:18) %>% 
+  gt::tab_row_group(label = "Vital signs", rows = 5:11) %>% 
+  gt::tab_row_group(label = "Demographics", rows = 1:4) %>% 
+  gt::tab_style(
+    style = list(
+      cell_fill(color = "#EFEFEF"),
+      cell_text(weight = "bold")
+    ),
+    locations = cells_row_groups()
+  )
+
+tbl_gtsummary_custom
+
+```
+
+However, you can also insert previously created `html` tables in your report. This is very handy because you do not need to write two times the same code. Usually you will have your full syntax code written in a `.R` syntax file and you will later create an .Rmd report for reporting main results, tables, plots, etc. If this is the case, you can save the table in `html` format from within your `.R` syntax file and insert it into your `.Rmd` file with the `htmltools` package.
+
+```{r }
+#| eval: false
+rawHTML_Table1 <- paste(readLines(glue::glue("Tables/Table1.html")), collapse = "\n")
+htmltools::HTML(rawHTML_Table1)
+```
+
+# Model
+
+We are going to fit a logistic regression model. We want to obtain predicted probabilities with the model. Probabilities are obtained with the equation below.
+
+$$
+Probability = \frac{1}{1 + e^{(-(lp))}} \text{, where lp =  } \alpha + x_1\beta_1 + x_2\beta_2 + x_n\beta_n  
+$$
+
+Yes, you can insert equations in Quarto with LaTeX notation. Take a look at different [LaTeX symbols](https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols).
+
+
+```{r}
+options(prType = 'html') #set print type option to html. Default is 'plain'
+model <- rms::lrm(day30 ~ rcs(age, 4)*sex + tx + Killip + rcs(pulse, 4) +
+               rcs(sysbp, 4) + miloc + pmi, x = T, y = T, data = df)
+print(model, digits = 4, table = TRUE, conf.int = 0.95, 
+      coefs = TRUE, title = 'Logistic regression model')
+```
+
+## Visualize Model 
+
+Suppose we would like to show different ways of visualizing/interpreting our model. We could show each Figure one below the other, but there is a more elegant way. Tabsets! Tabsets are very useful when wanting to report more than 1 Figure or Table. 
+
+:::: {.panel-tabset}
+
+### Nomogram
+
+```{r nom, fig.align='center', fig.dim=c(10,8), fig.cap='Nomogram.'}
+plot(nomogram(model))
+```
+
+### Partial (conditional) effect plots
+
+```{r pep, fig.align='center', fig.cap='Partial (conditional) effect plots. Probability scale instead of default log odds scale.'}
+ggplot(rms::Predict(model, fun = plogis), rdata = df)
+```
+
+### More
+
+```{r pep2, fig.align='center'}
+sbp <- c(60, 80, 100, 120)
+ggplot(rms::Predict(model, age, sysbp = sbp, fun = plogis)) 
+```
+
+### and more
+
+```{r pep3, fig.align='center'}
+ggplot(rms::Predict(model, age, sysbp = sbp, Killip, fun = plogis))
+```
+
+### Nested tabset
+
+We can embedd one tabset in another.
+
+::: {.panel-tabset}
+
+#### heatmap
+
+```{r }
+#| label: fig-heatmap
+#| fig-align: center
+#| fig-cap: Heatmap showing predicted probabilities at different ages and systolic blood pressure for the 4 Killip classes
+
+pred_intx <- rms::Predict(model, age, sysbp, Killip, fun = plogis, np = 100) 
+col <- base::rev(grDevices::heat.colors(999, alpha = 0.8))
+bounds <- rms::perimeter(df$age, df$sysbp, lowess. = T) #to see where data really exists
+
+rms::bplot(
+  pred_intx,
+  perim = bounds,
+  ylab = "sysbp",
+  col.regions = col
+  )
+```
+
+#### wireplot 3D
+
+```{r }
+#| label: fig-wire
+#| fig-align: center
+#| fig-cap: 3D plot
+#| fig-height: 7
+
+rms::bplot(
+  pred_intx,
+  lfun = wireframe,
+  perim = bounds,
+  ylab = "sysbp",
+  zlab = "Pr(30-day Death)",
+  shade = T
+  )
+```
+
+:::
+
+::::
+
+# Conclusion
+
+Hope this template will aid you when creating a `.html` report file with Quarto. Note that Quarto allows [visual editing mode](https://quarto.org/docs/visual-editor/) (just like R Markdown), making all aspects of creating and rendering a report very easy. 
+
+
+# Computing Environment
+
+```{r}
+sessioninfo::session_info(pkgs = c("attached"), include_base = T)
+```
+
+
+# Update History 
+
+::: {.callout-note collapse=true}
+
+# Click to expand
+
+| Date       | Changes   |
+| :--------- | :-------- |
+| 2023-05-13 | Published |
+
+:::
+
+# References
